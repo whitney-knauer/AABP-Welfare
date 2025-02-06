@@ -1318,8 +1318,8 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
   theme_classic()+
   theme (legend.position = "none", 
          legend.direction = "horizontal", 
-              axis.text = element_text(color = "black"), 
-               legend.text = element_text(color = "black"))
+              axis.text = element_text(color = "black", size=10), 
+               legend.text = element_text(color = "black", size=10))
 
 
 
