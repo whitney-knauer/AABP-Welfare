@@ -32,7 +32,7 @@ library(knitr)
 
 ```{r}
 
-cha <- read_csv("C:/Users/knaue020/Box/RESEARCH/PAIR HOUSING/AABP WELFARE/SURVEY/DATA/CHA 10312023.csv") 
+cha <- read_csv("data/CHA 10312023.csv") 
 
 #excluding the folks who said non-binary or prefer not to say for gender. 
 cha_mf <- cha %>%
@@ -112,7 +112,7 @@ CrossTable(cha$TimefromGrad, cha$Age, prop.r = FALSE, prop.c = FALSE)
 
 ```
 
-#Some Data Play with R using ChatGPT (hooray for AI)
+### Some Data Play with R using ChatGPT (hooray for AI)
 
 ```{r}
 # Create a proportion table for a categorical variable
@@ -185,7 +185,7 @@ tab1(cha$Nursecow, cum.percent=TRUE)
 
 Majority of respondents (76/157) still considered Individual housing to be the ideal way to raise dairy calves during the pre-weaning period. Then Pair, small group, large group, dam, nurse cow. Will be interesting to look at this parsed by different demographics.
 
-#Look at this same data by gender (maybe)
+### Look at this same data by gender (maybe)
 
 ```{r}
 
@@ -242,7 +242,9 @@ legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
 
 ```
 
-**This is by Gender 1** Non binary and prefer not to say were included in the same group.
+### **This is by Gender 1** 
+
+Non binary and prefer not to say were included in the same group.
 
 ```{r}
 
@@ -368,7 +370,9 @@ print(p_value_gender1woman)
 
 ```
 
-#Look at this same data by age. Dichotomized age to be "young" = 25-35, 36-45; "old"=over 46
+### Look at this same data by age. 
+
+Dichotomized age to be "young" = 25-35, 36-45; "old"=over 46
 
 ```{r}
 
@@ -462,9 +466,7 @@ print(p_value_age)
 
 ```
 
-
-
-#Look at this same data by country
+### Look at this same data by country
 
 ```{r}
 
@@ -537,7 +539,7 @@ legend("center", legend = c("CAN", "US"),
 
 ```
 
-#now same thing but with Top dairy in US
+### Now same thing but with Top dairy in US
 
 ```{r}
 
@@ -577,7 +579,9 @@ print(xtabs_top_nurse)
 
 ```
 
-##Same thing but with Dairy time (proportion of time working with dairy farms)
+### Same thing but with Dairy time 
+
+(proportion of time working with dairy farms)
 
 ```{r}
 
@@ -624,7 +628,9 @@ legend("center", legend = c(">75%", "25 - 50%", "50 - 75%"),
 
 ```
 
-*Put IN SAME MODEL?* For the rank of preference for ideal way to house dairy calves.
+### *Put IN SAME MODEL?* 
+
+For the rank of preference for ideal way to house dairy calves.
 
 ```{r}
 #can we put all these in the same model? 
@@ -726,7 +732,10 @@ exp(cbind(OR = coef(model), ci))
 
 ```
 
-**Same model** But with Age not dichotomized. 
+### **Same model** 
+
+But with Age not dichotomized.
+
 ```{r}
 #can we put all these in the same model? 
 
@@ -815,7 +824,7 @@ exp(cbind(OR = coef(model), ci))
 
 ```
 
-#Now on to acceptability of differnt practices
+### Acceptability of Practices
 
 ```{r}
 
@@ -846,7 +855,7 @@ tab1(cha$VET, cum.percent=TRUE)
 
 ```
 
-#Now to look at the same responses by other variables. First Gender
+#### By Gender
 
 ```{r}
 
@@ -903,7 +912,7 @@ legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
 
 ```
 
-#Acceptability of housing managmetn practices by grad year
+#### By Grad Year
 
 ```{r}
 
@@ -943,7 +952,7 @@ print(xtabs_time_accnurse)
 
 ```
 
-#Acceptability of different housing practices by country
+#### By Country
 
 ```{r}
 
@@ -997,7 +1006,7 @@ legend("center", legend = c("CAN", "US"),
 
 ```
 
-*Put IN SAME MODEL?* For the rank of acceptability of different housing practices.
+#### *Model*
 
 ```{r}
 #can we put all these in the same model? 
@@ -1093,7 +1102,7 @@ exp(cbind(OR = coef(model), ci))
 
 ```
 
-#General Public Most and Least Acceptable
+### Most and Least Acceptable - General Public
 
 ```{r}
 
@@ -1144,8 +1153,9 @@ legend("center", legend = c("young", "old"),
 
 ```
 
-#feasibility of the transition from individual to social housing? #how many participants had clients that socially housed? #How many participants had clients that reverted?\
-#What most common in 20years
+### Rest of outcomes
+
+Feasibility of transition, proportion socially housed, proportion clients reverted, most common 20y
 
 ```{r}
 
@@ -1178,7 +1188,7 @@ tab1(canada$MostComm20y, cum.percent=TRUE)
 
 ```
 
-\*\*Feasibility parsed\* By differnet predictors. And Modeled.
+### Feasibility Model
 
 ```{r}
 
@@ -1229,7 +1239,7 @@ legend("center", legend = c("CAN", "US"),
        fill = c(2, 4))
 ```
 
-*Most Common by other predictors* And ordinal Lregression model
+### Most Common 20y Model
 
 ```{r}
 
@@ -1270,6 +1280,88 @@ pR2(model)
 
 
 
+
+
+```
+
+### New Stacked Bar Charts for Pub
+
+First, most and least ideal ways to raise calves during the pre-weaning period
+
+```{r}
+
+df <- data.frame(
+  Group = c("Individual", "Pair (n=2)", "Small Group (n=3-8)", 
+            "Large Group (n>8)", "With Dam", "With Nurse Cow"),
+  Most_Ideal = c(48, 28, 15, 1, 6, 1),
+  Ideal_2 = c(17, 52, 16, 6, 4, 5),
+  Ideal_3 = c(16, 8, 54, 10, 5, 8),
+  Ideal_4 = c(9, 6, 8, 59, 10, 8),
+  Ideal_5 = c(4, 5, 7, 4, 49, 32),
+  Least_Ideal = c(6, 1, 0, 20, 26, 46)
+)
+
+df_long <- df |> 
+  pivot_longer(cols = -Group, names_to = "Rating", values_to = "Percentage")
+
+df_long$Group <- factor(df_long$Group, levels = rev(df$Group))  
+df_long$Rating <- factor(df_long$Rating, 
+                         levels = rev(c("Most_Ideal", "Ideal_2", "Ideal_3", 
+                                        "Ideal_4", "Ideal_5", "Least_Ideal")))
+
+ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_brewer(palette = "Blues",
+                    labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
+                     guide = guide_legend(nrow = 1, reverse=TRUE)) +  
+  labs(x = "Percentage of Respondents", y = "", fill = "") +
+  theme_classic()+
+  theme (legend.position = "none", 
+         legend.direction = "horizontal", 
+              axis.text = element_text(color = "black"), 
+               legend.text = element_text(color = "black"))
+
+
+
+
+
+```
+
+Next, acceptability of different housing practices
+
+```{r}
+
+df <- data.frame(
+  Group = c("Individual", "Pair (n=2)", "Small Group (n=3-8)", 
+            "Large Group (n>8)", "With Dam", "With Nurse Cow"),
+  Strongly_Agree = c(64, 65, 51, 13, 15, 12),
+  Somewhat_Agree = c(23, 27, 33, 31, 14, 19),
+  Neutral = c(3, 4, 8, 16, 22, 19),
+  Somewhat_Disagree = c(8, 3, 6, 28, 26, 28),
+  Strongly_Disagree = c(2, 1, 2, 12, 23, 22)
+)
+
+
+df_long <- df |> 
+  pivot_longer(cols = -Group, names_to = "Rating", values_to = "Percentage")
+
+df_long$Group <- factor(df_long$Group, levels = rev(df$Group))  
+df_long$Rating <- factor(df_long$Rating, 
+                         levels = rev(c("Strongly_Agree", "Somewhat_Agree",                                  "Neutral", "Somewhat_Disagree", "Strongly_Disagree")))
+
+
+
+ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_brewer(palette = "Blues",
+                    labels = c("Strongly Disagree","", "Neutral", "","Strongly Agree"), 
+                     guide = guide_legend(nrow = 1, reverse=TRUE)) +  
+  labs(x = "Percentage of Respondents", y = "", fill = "") +
+  theme_classic()+
+  theme (legend.position = "none",
+         legend.direction = "vertical",
+              axis.text = element_text(color = "black", size=10), 
+               legend.text = element_text(color = "black", size=10))
 
 
 ```
