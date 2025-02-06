@@ -1,0 +1,1275 @@
+---
+title: "AABP Survey Demographics"
+author: "Whitney Knauer"
+date: "2023-10-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = FALSE}
+
+library(tidyverse)
+library(skimr)
+library(dplyr)
+library(ggplot2)
+library(ggbeeswarm)
+library(lme4)
+library(car)
+library(emmeans)
+library(gmodels)
+library(epiDisplay)
+library(psych)
+library(doBy)
+library(ggpubr)
+library(MASS)
+library(pscl)
+library(knitr)
+
+```
+
+```{r}
+
+cha <- read_csv("C:/Users/knaue020/Box/RESEARCH/PAIR HOUSING/AABP WELFARE/SURVEY/DATA/CHA 10312023.csv") 
+
+#excluding the folks who said non-binary or prefer not to say for gender. 
+cha_mf <- cha %>%
+  filter(Gender1 != "NO")
+cha_mf$Indv <- factor(cha_mf$Indv, ordered = TRUE)
+cha_mf$Pair <- factor(cha_mf$Pair, ordered = TRUE)
+cha_mf$SmGrp <- factor(cha_mf$SmGrp, ordered = TRUE)
+cha_mf$LargeGrp <- factor(cha_mf$LargeGrp, ordered = TRUE)
+cha_mf$Dam <- factor(cha_mf$Dam, ordered = TRUE)
+cha_mf$Nursecow <- factor(cha_mf$Nursecow, ordered = TRUE)
+
+cha_mf$HouseIndv <- factor(cha_mf$HouseIndv, ordered = TRUE)
+cha_mf$HousePair <- factor(cha_mf$HousePair, ordered = TRUE)
+cha_mf$HouseSmlGrp <- factor(cha_mf$HouseSmlGrp, ordered = TRUE)
+cha_mf$HouseLrgGrp <- factor(cha_mf$HouseLrgGrp, ordered = TRUE)
+cha_mf$WithDam <- factor(cha_mf$WithDam, ordered = TRUE)
+cha_mf$WithNurse <- factor(cha_mf$WithNurse, ordered = TRUE)
+
+cha_mf$FeasibleINDVtoPAIR <- factor(cha_mf$FeasibleINDVtoPAIR, ordered = TRUE)
+cha_mf$MostComm20y<- factor(cha_mf$MostComm20y, ordered = TRUE)
+cha_mf$Country <- factor(cha_mf$Country)
+
+# Viewing the first few rows of the filtered dataset
+head(cha_mf)
+
+# Use the subset function to create a new data set with a subset of variable "B"
+usa <- subset(cha, Country == "US")
+canada <- subset (cha, Country == "CAN")
+
+# Print the new data set
+print(usa)
+print(canada)
+
+    
+glimpse (cha)
+
+```
+
+```{r}
+
+tab1(cha$VetSchool, sort.group = "decreasing", cum.percent = TRUE)
+tab1(cha$GradYear, cum.percent=TRUE)
+tab1(cha$TimefromGrad, sort.group = "alphabet", cum.percent= TRUE)
+tab1(cha$PracticeRegion, sort.group = "decreasing", cum.percent = TRUE)
+tab1(cha$Gender, sort.group = "decreasing", cum.percent = TRUE)
+tab1(cha$Age, sort.group = "decreasing", cum.percent = TRUE)
+tab1(cha$PrimaryEmployer, sort.group = "decreasing", cum.percent = TRUE)
+tab1(cha$Country, sort.group = "decreasing", cum.percent = TRUE)
+tab1(usa$Top10Dairy, sort.group = "decreasing", cum.percent = TRUE)
+tab1(usa$DairyRegion, sort.group="decreasing", cum.percent=TRUE)
+tab1(canada$DairyRegion, sort.group="decreasing", cum.percent=TRUE)
+
+# Open a larger plotting device
+pdf("my_plot.pdf", width = 10, height = 6)  # Adjust width and height as needed
+
+# Create your plot
+tab1(cha$`Type of Operations`, sort.group = "increasing")
+
+# Close the plotting device when you're done
+dev.off()
+
+tab1(cha$DairyTime, sort.group = "decreasing", cum.percent = TRUE)
+
+
+
+
+
+
+```
+
+```{r}
+length(cha$Gender)
+length(cha$Age)
+
+CrossTable(cha$Gender, cha$Age, prop.r = FALSE, prop.c = FALSE)
+CrossTable(cha$TimefromGrad, cha$Age, prop.r = FALSE, prop.c = FALSE)
+
+```
+
+#Some Data Play with R using ChatGPT (hooray for AI)
+
+```{r}
+# Create a proportion table for a categorical variable
+prop.table(table(cha$TimefromGrad))
+
+# Calculate the proportions and convert to a data frame
+prop_table <- prop.table(table(cha$TimefromGrad))
+prop_table_df <- as.data.frame(prop_table)
+
+# Rename the columns for clarity
+colnames(prop_table_df) <- c("TimefromGrad", "Proportion")
+
+# Print the data frame
+print(prop_table_df)
+
+
+table(cha$Gender, cha$TimefromGrad)
+
+
+
+# Create a table of counts
+count_table <- table(cha$TimefromGrad)
+
+# Create a table of proportions
+prop_table <- prop.table(count_table)
+
+# Combine count and proportion tables into a data frame
+result_table <- data.frame(Category = names(count_table), Count = as.numeric(count_table), Proportion = prop_table)
+
+# Print the result table
+print(result_table)
+
+
+```
+
+```{r}
+
+#Likert Style Questions. 
+#How ideal is individual housing
+
+tab1(cha$Indv, cum.percent=TRUE)
+
+#Likert Style Questions. 
+#How ideal is pair housing
+
+tab1(cha$Pair, cum.percent=TRUE)
+
+#Likert Style Questions. 
+#How ideal is small group housing
+
+tab1(cha$SmGrp, cum.percent=TRUE)
+
+#Likert Style Questions. 
+#How ideal is Large Group housing
+
+tab1(cha$LargeGrp, cum.percent=TRUE)
+
+#Likert Style Questions. 
+#How ideal is dam housing
+
+tab1(cha$Dam, cum.percent=TRUE)
+
+#Likert Style Questions. 
+#How ideal is Nurse Cow housing
+
+tab1(cha$Nursecow, cum.percent=TRUE)
+
+
+```
+
+Majority of respondents (76/157) still considered Individual housing to be the ideal way to raise dairy calves during the pre-weaning period. Then Pair, small group, large group, dam, nurse cow. Will be interesting to look at this parsed by different demographics.
+
+#Look at this same data by gender (maybe)
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_gender_indv <- xtabs(~ Gender + Indv, cha)
+# Display the tables
+print(xtabs_gender_indv)
+
+barplot(xtabs_gender_indv, beside = TRUE, col = c("red", "blue", "green","purple"))
+
+# Adding labels to the bars
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+
+#Pair
+xtabs_gender_pair <- xtabs(~ Gender + Pair, cha)
+print(xtabs_gender_pair)
+barplot(xtabs_gender_pair, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#Small Group
+xtabs_gender_small <- xtabs(~ Gender + SmGrp, cha)
+print(xtabs_gender_small)
+barplot(xtabs_gender_small, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#Large Group
+xtabs_gender_large <- xtabs(~ Gender + LargeGrp, cha)
+print(xtabs_gender_large)
+barplot(xtabs_gender_large, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#Dam
+xtabs_gender_dam <- xtabs(~ Gender + Dam, cha)
+print(xtabs_gender_dam)
+barplot(xtabs_gender_dam, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#Nurse Cow
+xtabs_gender_nurse <- xtabs(~ Gender + Nursecow, cha)
+print(xtabs_gender_nurse)
+barplot(xtabs_gender_nurse, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+
+
+```
+
+**This is by Gender 1** Non binary and prefer not to say were included in the same group.
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_gender_indv <- xtabs(~ Gender1 + Indv, cha)
+# Display the tables
+print(xtabs_gender_indv)
+
+barplot(xtabs_gender_indv, beside = TRUE, col = c("red", "blue", "purple"))
+
+# Adding labels to the bars
+legend("center", legend = c("Man", "NO", "Woman"),
+       fill = c("red", "blue", "purple"))
+
+#trying ordinal logistic regression for these outcomes, using the cha_mf data set bc only want those who identify as either male or female. 
+
+# Fit ordinal logistic regression model
+model <- polr(Indv ~ Gender1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+
+# Extract the z-value for Gender1Woman
+z_value_gender1woman <- summary_model$coefficients["Gender1Woman", "t value"]
+
+# Calculate the p-value using the cumulative distribution function of the standard normal distribution
+p_value_gender1woman <- 2 * (1 - pnorm(abs(z_value_gender1woman)))
+
+# Print the p-value
+print(p_value_gender1woman)
+
+#overall P value is 0.08
+
+
+#Pair
+xtabs_gender_pair <- xtabs(~ Gender1 + Pair, cha)
+print(xtabs_gender_pair)
+barplot(xtabs_gender_pair, beside = TRUE, col = c("red", "blue","purple"))
+legend("center", legend = c("man", "NO", "woman"),
+       fill = c("red", "blue","purple"))
+
+
+model <- polr(Pair~ Gender1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_gender1woman <- summary_model$coefficients["Gender1Woman", "t value"]
+p_value_gender1woman <- 2 * (1 - pnorm(abs(z_value_gender1woman)))
+print(p_value_gender1woman)
+
+#overall p value = 0.44
+
+
+
+
+#Small Group
+xtabs_gender_small <- xtabs(~ Gender1 + SmGrp, cha)
+print(xtabs_gender_small)
+barplot(xtabs_gender_small, beside = TRUE, col = c("red", "blue","purple"))
+legend("center", legend = c("man", "NO", "woman"),
+       fill = c("red", "blue","purple"))
+
+
+model <- polr(SmGrp ~ Gender1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_gender1woman <- summary_model$coefficients["Gender1Woman", "t value"]
+p_value_gender1woman <- 2 * (1 - pnorm(abs(z_value_gender1woman)))
+print(p_value_gender1woman)
+
+#overall p value = 0.27
+
+#Large Group
+xtabs_gender_large <- xtabs(~ Gender1 + LargeGrp, cha)
+print(xtabs_gender_large)
+barplot(xtabs_gender_large, beside = TRUE, col = c("red", "blue","purple"))
+legend("center", legend = c("man", "NO", "woman"),
+       fill = c("red", "blue","purple"))
+
+model <- polr(LargeGrp~ Gender1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_gender1woman <- summary_model$coefficients["Gender1Woman", "t value"]
+p_value_gender1woman <- 2 * (1 - pnorm(abs(z_value_gender1woman)))
+print(p_value_gender1woman)
+
+#Overall difference between Men and Women in their acceptability of Large Group (p=0.02. Likely that women #found it a lot less ideal. Now how to look at different levels? What a cluster fuck. 
+
+
+#Dam
+xtabs_gender_dam <- xtabs(~ Gender1 + Dam, cha)
+print(xtabs_gender_dam)
+barplot(xtabs_gender_dam, beside = TRUE, col = c("red", "blue","purple"))
+legend("center", legend = c("man", "NO", "woman"),
+       fill = c("red", "blue","purple"))
+
+model <- polr(Dam~ Gender1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_gender1woman <- summary_model$coefficients["Gender1Woman", "t value"]
+p_value_gender1woman <- 2 * (1 - pnorm(abs(z_value_gender1woman)))
+print(p_value_gender1woman)
+
+#Overall P value= 0.06
+
+
+
+#Nurse Cow
+xtabs_gender_nurse <- xtabs(~ Gender1 + Nursecow, cha)
+print(xtabs_gender_nurse)
+barplot(xtabs_gender_nurse, beside = TRUE, col = c("red", "blue","purple"))
+legend("center", legend = c("man", "NO", "woman"),
+       fill = c("red", "blue","purple"))
+
+model <- polr(Nursecow~ Gender1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_gender1woman <- summary_model$coefficients["Gender1Woman", "t value"]
+p_value_gender1woman <- 2 * (1 - pnorm(abs(z_value_gender1woman)))
+print(p_value_gender1woman)
+
+#overall p value = 0.35
+
+```
+
+#Look at this same data by age. Dichotomized age to be "young" = 25-35, 36-45; "old"=over 46
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_time_indv <- xtabs(~ Age1 + Indv, cha)
+# Display the tables
+print(xtabs_time_indv)
+
+model <- polr(Indv~ Age1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_age <- summary_model$coefficients["Age1young", "t value"]
+p_value_age <- 2 * (1 - pnorm(abs(z_value_age)))
+print(p_value_age)
+
+#P = 0.07
+
+#Pair
+xtabs_time_pair <- xtabs(~ Age1 + Pair, cha)
+print(xtabs_time_pair)
+
+model <- polr(Pair~ Age1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_age <- summary_model$coefficients["Age1young", "t value"]
+p_value_age <- 2 * (1 - pnorm(abs(z_value_age)))
+print(p_value_age)
+
+# P = 0.052
+
+
+#Small Group
+xtabs_time_small <- xtabs(~ Age1 + SmGrp, cha)
+print(xtabs_time_small)
+
+model <- polr(SmGrp~ Age1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_age <- summary_model$coefficients["Age1young", "t value"]
+p_value_age <- 2 * (1 - pnorm(abs(z_value_age)))
+print(p_value_age)
+
+#P = 0.28
+
+
+#Large Group
+xtabs_time_large <- xtabs(~ Age1 + LargeGrp, cha)
+print(xtabs_time_large)
+
+model <- polr(LargeGrp~ Age1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_age <- summary_model$coefficients["Age1young", "t value"]
+p_value_age <- 2 * (1 - pnorm(abs(z_value_age)))
+print(p_value_age)
+
+#P = 0.71
+
+
+#Dam
+xtabs_time_dam <- xtabs(~ Age1 + Dam, cha)
+print(xtabs_time_dam)
+
+model <- polr(Dam~ Age1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_age <- summary_model$coefficients["Age1young", "t value"]
+p_value_age <- 2 * (1 - pnorm(abs(z_value_age)))
+print(p_value_age)
+
+#P = 0.58
+
+
+#Nurse Cow
+xtabs_time_nurse <- xtabs(~ Age1 + Nursecow, cha)
+print(xtabs_time_nurse)
+
+model <- polr(Nursecow~ Age1, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_age <- summary_model$coefficients["Age1young", "t value"]
+p_value_age <- 2 * (1 - pnorm(abs(z_value_age)))
+print(p_value_age)
+
+#P = 0.12
+
+
+
+
+```
+
+
+
+#Look at this same data by country
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_usa_indv <- xtabs(~ Country + Indv, cha)
+# Display the tables
+print(xtabs_usa_indv)
+barplot(xtabs_usa_indv, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+model <- polr(Indv~ Country, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_usa <- summary_model$coefficients["CountryUS", "t value"]
+p_value_usa <- 2 * (1 - pnorm(abs(z_value_usa)))
+print(p_value_usa)
+
+#P = 0.009
+
+
+#Pair
+xtabs_usa_pair <- xtabs(~ Country + Pair, cha)
+print(xtabs_usa_pair)
+barplot(xtabs_usa_pair, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+model <- polr(Indv~ Country, data = cha_mf, Hess=TRUE)
+summary(model)
+summary_model <- summary(model)
+z_value_usa <- summary_model$coefficients["CountryUS", "t value"]
+p_value_usa <- 2 * (1 - pnorm(abs(z_value_age)))
+print(p_value_usa)
+
+#P = 0.12
+
+
+#Small Group
+xtabs_usa_small <- xtabs(~ Country + SmGrp, cha)
+print(xtabs_usa_small)
+barplot(xtabs_usa_small, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+#Large Group
+xtabs_usa_large <- xtabs(~ Country + LargeGrp, cha)
+print(xtabs_usa_large)
+barplot(xtabs_usa_large, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+#Dam
+xtabs_usa_dam <- xtabs(~ Country + Dam, cha)
+print(xtabs_usa_dam)
+barplot(xtabs_usa_dam, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+#Nurse Cow
+xtabs_usa_nurse <- xtabs(~ Country + Nursecow, cha)
+print(xtabs_usa_nurse)
+barplot(xtabs_usa_nurse, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+
+
+```
+
+#now same thing but with Top dairy in US
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_top_indv <- xtabs(~ Top10Dairy + Indv, usa)
+# Display the tables
+print(xtabs_top_indv)
+
+
+#Pair
+xtabs_top_pair <- xtabs(~ Top10Dairy + Pair, usa)
+print(xtabs_top_pair)
+
+
+#Small Group
+xtabs_top_small <- xtabs(~ Top10Dairy + SmGrp, usa)
+print(xtabs_top_small)
+
+
+#Large Group
+xtabs_top_large <- xtabs(~ Top10Dairy + LargeGrp, usa)
+print(xtabs_top_large)
+
+
+#Dam
+xtabs_top_dam <- xtabs(~ Top10Dairy + Dam, usa)
+print(xtabs_top_dam)
+
+#Nurse Cow
+xtabs_top_nurse <- xtabs(~ Top10Dairy + Nursecow, usa)
+print(xtabs_top_nurse)
+
+
+
+
+```
+
+##Same thing but with Dairy time (proportion of time working with dairy farms)
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_time_indv <- xtabs(~ DairyTime + Indv, cha)
+# Display the tables
+print(xtabs_time_indv)
+
+
+#Pair
+xtabs_time_pair <- xtabs(~ DairyTime+ Pair, cha)
+print(xtabs_time_pair)
+
+
+#Small Group
+xtabs_time_small <- xtabs(~ DairyTime + SmGrp, cha)
+print(xtabs_time_small)
+
+
+#Large Group
+xtabs_time_large <- xtabs(~ DairyTime + LargeGrp, cha)
+print(xtabs_time_large)
+
+
+#Dam
+xtabs_time_dam <- xtabs(~ DairyTime + Dam, cha)
+print(xtabs_time_dam)
+
+#Nurse Cow
+xtabs_time_nurse <- xtabs(~ DairyTime + Nursecow, cha)
+print(xtabs_time_nurse)
+
+# Assuming you have an xtabs result in xtabs_table
+bp <- barplot(xtabs_time_nurse, beside = TRUE, col = c("pink", "blue", "green"))
+
+# Adding labels to the bars
+legend("center", legend = c(">75%", "25 - 50%", "50 - 75%"),
+       fill = c("pink", "blue", "green"))
+
+
+
+
+```
+
+*Put IN SAME MODEL?* For the rank of preference for ideal way to house dairy calves.
+
+```{r}
+#can we put all these in the same model? 
+
+#INDV: Country sig, age and gender are not. 
+#people from US are at a lower odds of being in a higher category (more positive for indv housing)
+cha_mf$Country <- relevel(cha_mf$Country, ref = "US")
+
+model <- polr(Indv~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+cha_mf$Country <- relevel(cha_mf$Country, ref = "CAN")
+
+model <- polr(Indv~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+#Pair: nothing significant
+model <- polr(Pair~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+#Small Group: country yes, age and gender no
+#US has higher odds of being in a higher category
+model <- polr(SmGrp~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Large Group: gender different, age, country no
+#being a woman is associated with a higher odds of being in a higher category
+model <- polr(LargeGrp~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Dam: no differences
+model <- polr(Dam~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Nurse Cow: gender and age, country no
+#Women lower odds in higher category
+#youths higher odds of higher category
+model <- polr(Nursecow~ Gender1 + Age1 + Country , data = cha_mf, Hess=TRUE)
+summary(model)
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+```
+
+**Same model** But with Age not dichotomized. 
+```{r}
+#can we put all these in the same model? 
+
+#INDV: Country sig, age and gender are not. 
+#people from US are at a lower odds of being in a higher category (more positive for indv housing)
+
+cha_mf$Country <- relevel(cha_mf$Country, ref = "CAN")
+
+model <- polr(Indv~ Gender1 + Age + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+#Pair: nothing significant
+model <- polr(Pair~ Gender1 + Age + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+#Small Group: country yes, age and gender no
+#US has higher odds of being in a higher category
+model <- polr(SmGrp~ Gender1 + Age + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Large Group: gender different, age, country no
+#being a woman is associated with a higher odds of being in a higher category
+model <- polr(LargeGrp~ Gender1 + Age + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Dam: no differences
+model <- polr(Dam~ Gender1 + Age + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Nurse Cow: gender and age, country no
+#Women lower odds in higher category
+#youths higher odds of higher category
+model <- polr(Nursecow~ Gender1 + Age + Country , data = cha_mf, Hess=TRUE)
+summary(model)
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+```
+
+#Now on to acceptability of differnt practices
+
+```{r}
+
+#Housing calves individually is an acceptable way to raise calves
+tab1(cha$HouseIndv, cum.percent=TRUE)
+
+#Housing calves in a pair is an acceptable way to raise calves
+tab1(cha$HousePair, cum.percent=TRUE)
+
+#Housing calves in small group is an acceptable way to raise calves
+tab1(cha$HouseSmlGrp, cum.percent=TRUE)
+
+#Housing calves in large groups is an acceptable way to raise calves
+tab1(cha$HouseLrgGrp, cum.percent=TRUE)
+
+#Housing calves with other cow calf pairs acceptable way to raise calves
+tab1(cha$WithDam, cum.percent=TRUE)
+
+#Housing calves with nurse cows acceptable way to raise calves
+tab1(cha$WithNurse, cum.percent=TRUE)
+
+#Attention question: I am a vet (100% of sample should agree)
+tab1(cha$VET, cum.percent=TRUE)
+
+
+
+
+
+```
+
+#Now to look at the same responses by other variables. First Gender
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_acc_indv <- xtabs(~ Gender1 + HouseIndv, cha)
+# Display the tables
+print(xtabs_acc_indv)
+
+barplot(xtabs_acc_indv, beside = TRUE, col = c("red", "blue", "green","purple"))
+
+# Adding labels to the bars
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+
+#Pair
+xtabs_acc_pair <- xtabs(~ Gender1 + HousePair, cha)
+print(xtabs_acc_pair)
+barplot(xtabs_acc_pair, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#Small Group
+xtabs_acc_small <- xtabs(~ Gender1 + HouseSmlGrp, cha)
+print(xtabs_acc_small)
+barplot(xtabs_acc_small, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#Large Group
+xtabs_acc_large <- xtabs(~ Gender1 + HouseLrgGrp, cha)
+print(xtabs_acc_large)
+barplot(xtabs_acc_large, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#Dam
+xtabs_acc_dam <- xtabs(~ Gender1 + WithDam, cha)
+print(xtabs_acc_dam)
+barplot(xtabs_acc_dam, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#Nurse Cow
+xtabs_acc_nurse <- xtabs(~ Gender1 + WithNurse, cha)
+print(xtabs_acc_nurse)
+barplot(xtabs_acc_nurse, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+
+
+```
+
+#Acceptability of housing managmetn practices by grad year
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_time_accindv <- xtabs(~ Age1 + HouseIndv, cha)
+# Display the tables
+print(xtabs_time_accindv)
+
+
+#Pair
+xtabs_time_accpair <- xtabs(~ Age1 + HousePair, cha)
+print(xtabs_time_accpair)
+
+
+#Small Group
+xtabs_time_accsmall <- xtabs(~ Age1 + HouseSmlGrp, cha)
+print(xtabs_time_accsmall)
+
+
+#Large Group
+xtabs_time_acclarge <- xtabs(~ Age1 + HouseLrgGrp, cha)
+print(xtabs_time_acclarge)
+
+
+#Dam
+xtabs_time_accdam <- xtabs(~ Age1 + WithDam, cha)
+print(xtabs_time_accdam)
+
+#Nurse Cow
+xtabs_time_accnurse <- xtabs(~ Age1 + WithNurse, cha)
+print(xtabs_time_accnurse)
+
+
+
+
+```
+
+#Acceptability of different housing practices by country
+
+```{r}
+
+#Individual
+
+# Using xtabs()
+xtabs_usa_accindv <- xtabs(~ Country + HouseIndv, cha)
+# Display the tables
+print(xtabs_usa_accindv)
+barplot(xtabs_usa_accindv, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+
+#Pair
+xtabs_usa_accpair <- xtabs(~ Country + HousePair, cha)
+print(xtabs_usa_accpair)
+barplot(xtabs_usa_accpair, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+#Small Group
+xtabs_usa_accsmall <- xtabs(~ Country + HouseSmlGrp, cha)
+print(xtabs_usa_accsmall)
+barplot(xtabs_usa_accsmall, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+#Large Group
+xtabs_usa_acclarge <- xtabs(~ Country + HouseLrgGrp, cha)
+print(xtabs_usa_acclarge)
+barplot(xtabs_usa_acclarge, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+#Dam
+xtabs_usa_accdam <- xtabs(~ Country + WithDam, cha)
+print(xtabs_usa_accdam)
+barplot(xtabs_usa_accdam, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+#Nurse Cow
+xtabs_usa_accnurse <- xtabs(~ Country + WithNurse, cha)
+print(xtabs_usa_accnurse)
+barplot(xtabs_usa_accnurse, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+
+
+```
+
+*Put IN SAME MODEL?* For the rank of acceptability of different housing practices.
+
+```{r}
+#can we put all these in the same model? 
+
+#INDV: Gender and country are significant, age is not
+#What does the outcome mean? Being a woman is associated with being in a higher category (less enthusiastic about individual housing). Being from the US is associated with a lower odds of being in a higher category. 
+#if the coefficient is - (associated with lower odds of begin in higher category)
+#if the coefficient is + (associated with higher odds of begin in a higher category)
+
+#So being female is associated with being less supporting of individual housing; being from US means more supportive of individual housing. 
+
+model <- polr(HouseIndv~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+#Pair: Age and Country are sig, gender is not
+#begin young is associated with lower odds of being in higher category (youths love pair housing)
+#being from US associated with higher odds of being in a higher category (Canadians love pair housing)
+model <- polr(HousePair~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+#Small Group: gender and country yes
+#being a woman associated with lower odds of being in a higher category
+#being from US associated with higher odds of being in a higher category
+model <- polr(HouseSmlGrp~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Large Group: age yes, gender and country no
+#being a young associated with have lower odds of being in higher category
+model <- polr(HouseLrgGrp~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Dam: no differences
+model <- polr(WithDam~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+#Nurse Cow: no differences
+model <- polr(WithNurse~ Gender1 + Age1 + Country , data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+
+
+```
+
+#General Public Most and Least Acceptable
+
+```{r}
+
+tab1(cha$GeneralPubMost, cum.percent=TRUE)
+tab1(cha$GeneralPubLeast, cum.percent=TRUE)
+
+#by gender
+xtabs_most <- xtabs(~ Gender1 + GeneralPubMost, cha)
+print(xtabs_most)
+barplot(xtabs_most, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+
+xtabs_least <- xtabs(~ Gender1 + GeneralPubLeast, cha)
+print(xtabs_least)
+barplot(xtabs_least, beside = TRUE, col = c("red", "blue", "green","purple"))
+legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
+       fill = c("red", "blue", "green","purple"))
+
+#by country
+
+xtabs_countrymost <- xtabs(~ Country + GeneralPubMost, cha)
+print(xtabs_countrymost)
+barplot(xtabs_countrymost, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+xtabs_countryleast <- xtabs(~ Country + GeneralPubLeast, cha)
+print(xtabs_countryleast)
+barplot(xtabs_countryleast, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+
+#by age
+xtabs_agemost <- xtabs(~ Age1 + GeneralPubMost, cha)
+print(xtabs_agemost)
+barplot(xtabs_agemost, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("young", "old"),
+       fill = c(2, 4))
+
+xtabs_ageleast <- xtabs(~ Age1 + GeneralPubLeast, cha)
+print(xtabs_ageleast)
+barplot(xtabs_ageleast, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("young", "old"),
+       fill = c(2, 4))
+
+
+```
+
+#feasibility of the transition from individual to social housing? #how many participants had clients that socially housed? #How many participants had clients that reverted?\
+#What most common in 20years
+
+```{r}
+
+tab1(cha$SocialHouse, cum.percent=TRUE)
+# Using xtabs()
+xtabs_socialtype <- xtabs(~ SocialHouse + SocHT, cha)
+# Display the tables
+print(xtabs_socialtype)
+result_df <- as.data.frame(xtabs_socialtype)
+print(result_df)
+
+
+
+tab1(cha$FeasibleINDVtoPAIR, cum.percent=TRUE)
+tab1(cha$Reverters, cum.percent=TRUE)
+
+# Using xtabs()
+xtabs_revertertype <- xtabs(~ Reverters + HouseType, cha)
+# Display the tables
+print(xtabs_revertertype)
+result_df <- as.data.frame(xtabs_revertertype)
+print(result_df)
+
+
+tab1(cha$MostComm20y, cum.percent=TRUE)
+tab1(usa$MostComm20y, cum.percent=TRUE)
+tab1(canada$MostComm20y, cum.percent=TRUE)
+
+
+
+```
+
+\*\*Feasibility parsed\* By differnet predictors. And Modeled.
+
+```{r}
+
+#age, young vs old
+xtabs_agefease <- xtabs(~ Age1 + FeasibleINDVtoPAIR, cha)
+print(xtabs_agefease)
+barplot(xtabs_agefease, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("young", "old"),
+       fill = c(2, 4))
+
+
+#Gender, male vs. female
+xtabs_sexfease <- xtabs(~ Gender1 + FeasibleINDVtoPAIR, cha)
+print(xtabs_sexfease)
+barplot(xtabs_sexfease, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("man", "woman"),
+       fill = c(2, 4))
+
+
+#Country
+xtabs_usafease <- xtabs(~ Country + FeasibleINDVtoPAIR, cha)
+print(xtabs_usafease)
+barplot(xtabs_usafease, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("US", "CAN"),
+       fill = c(2, 4))
+
+#Transition Feasibility: country yes, not age or gender
+#US higher odds in being in a higher category. They hate the idea. Canadaians LOEVE it. 
+model <- polr(FeasibleINDVtoPAIR~ Gender1 + Age1 + Country , data = cha_mf, Hess=TRUE)
+summary(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+```
+
+```{r}
+#Reverters by country
+xtabs_usarevert <- xtabs(~ Country + Reverters, cha)
+print(xtabs_usarevert)
+barplot(xtabs_usarevert, beside = TRUE, col = c(2, 4))
+legend("center", legend = c("CAN", "US"),
+       fill = c(2, 4))
+```
+
+*Most Common by other predictors* And ordinal Lregression model
+
+```{r}
+
+xtabs_common <- xtabs(~ Age1 + MostComm20y, cha)
+print(xtabs_common)
+
+xtabs_common <- xtabs(~ Gender1 + MostComm20y, cha)
+print(xtabs_common)
+
+xtabs_common <- xtabs(~ DairyRegion + MostComm20y, cha)
+print(xtabs_common)
+
+
+#Most Common in 20years: no differences, but not sure this is the right way to handle this data? 
+model <- polr(MostComm20y~ Gender1 + Age1 + Country , data = cha_mf, method="logistic", Hess=TRUE)
+summary(model)
+logLik(model)
+pR2(model)
+
+ctable <- coef(summary(model))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(model))
+confint.default(model)
+exp(coef(model))
+exp(cbind(OR = coef(model), ci))
+
+
+
+
+
+#ordered probit regression
+model <- polr(MostComm20y~ Gender1 + Age1 + Country , data = cha_mf, method="probit", Hess=TRUE)
+summary(model)
+logLik(model)
+pR2(model)
+
+
+
+
+
+
+```
