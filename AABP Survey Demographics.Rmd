@@ -242,7 +242,7 @@ legend("center", legend = c("man", "non-binary", "prefer not to say", "woman"),
 
 ```
 
-### **This is by Gender 1** 
+### **This is by Gender 1**
 
 Non binary and prefer not to say were included in the same group.
 
@@ -370,7 +370,7 @@ print(p_value_gender1woman)
 
 ```
 
-### Look at this same data by age. 
+### Look at this same data by age.
 
 Dichotomized age to be "young" = 25-35, 36-45; "old"=over 46
 
@@ -579,7 +579,7 @@ print(xtabs_top_nurse)
 
 ```
 
-### Same thing but with Dairy time 
+### Same thing but with Dairy time
 
 (proportion of time working with dairy farms)
 
@@ -628,7 +628,7 @@ legend("center", legend = c(">75%", "25 - 50%", "50 - 75%"),
 
 ```
 
-### *Put IN SAME MODEL?* 
+### *Put IN SAME MODEL?*
 
 For the rank of preference for ideal way to house dairy calves.
 
@@ -732,7 +732,7 @@ exp(cbind(OR = coef(model), ci))
 
 ```
 
-### **Same model** 
+### **Same model**
 
 But with Age not dichotomized.
 

@@ -1,8 +1,12 @@
 ---
 title: "AABP Survey Demographics"
 author: "Whitney Knauer"
-date: "2023-10-31"
-output: html_document
+date: "today"
+format: 
+  html:
+    toc: true 
+    toc-float: true
+    toc-location: right
 ---
 
 ```{r setup, include=FALSE}
@@ -36,7 +40,7 @@ library(knitr)
 #| include: false
 #| echo: false
 
-cha <- read_csv("C:/Users/knaue020/Box/RESEARCH/PAIR HOUSING/AABP WELFARE/SURVEY/DATA/CHA 10312023.csv") 
+cha <- read_csv("data/CHA 10312023.csv") 
 
 #excluding the folks who said non-binary or prefer not to say for gender. 
 cha_mf <- cha %>%
@@ -75,7 +79,7 @@ glimpse (cha)
 
 ```
 
-## Demographic Data 
+## Demographic Data
 
 ```{r}
 #| echo: false
@@ -111,7 +115,6 @@ tab1(cha$DairyTime, sort.group = "decreasing", cum.percent = TRUE)
 ```
 
 ```{r}
-#| include: false
 #| echo: false
 
 length(cha$Gender)
@@ -119,6 +122,17 @@ length(cha$Age)
 
 CrossTable(cha$Gender, cha$Age, prop.r = FALSE, prop.c = FALSE)
 CrossTable(cha$TimefromGrad, cha$Age, prop.r = FALSE, prop.c = FALSE)
+
+cha |> 
+  group_by(Gender1, Age1) |> 
+  count()
+
+25/(52+25)
+64/(12+64)
+
+52/(25+52)
+12/(64+12)
+
 
 ```
 
@@ -1118,7 +1132,7 @@ exp(cbind(OR = coef(model), ci))
 
 ```
 
-## General Public Feelings 
+## General Public Feelings
 
 (Most and Least Acceptable)
 
@@ -1203,7 +1217,7 @@ legend("center", legend = c("US", "CAN"),
 
 #Transition Feasibility: country yes, not age or gender
 #US higher odds in being in a higher category. They hate the idea. Canadaians LOEVE it. 
-model <- polr(FeasibleINDVtoPAIR~ Gender1 + Age1 + Country , data = cha_mf, Hess=TRUE)
+model <- polr(FeasibleINDVtoPAIR~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
 summary(model)
 
 ctable <- coef(summary(model))
@@ -1233,6 +1247,13 @@ print(result_df)
 
 ```{r}
 tab1(cha$Reverters, cum.percent=TRUE)
+
+cha |> 
+  group_by(Country, Reverters) |> 
+  count()
+
+14/(27+14)
+56/(56+58)
 
 # Using xtabs()
 xtabs_revertertype <- xtabs(~ Reverters + HouseType, cha)
@@ -1280,6 +1301,89 @@ p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
 confint.default(model)
 exp(coef(model))
 exp(cbind(OR = coef(model), ci))
+
+
+```
+
+## New Stacked Bar Charts for Pub
+
+### Most and Least Ideal
+
+```{r}
+
+df <- data.frame(
+  Group = c("Individual", "Pair (n=2)", "Small Group (n=3-8)", 
+            "Large Group (n>8)", "With Dam", "With Nurse Cow"),
+  Most_Ideal = c(48, 28, 15, 1, 6, 1),
+  Ideal_2 = c(17, 52, 16, 6, 4, 5),
+  Ideal_3 = c(16, 8, 54, 10, 5, 8),
+  Ideal_4 = c(9, 6, 8, 59, 10, 8),
+  Ideal_5 = c(4, 5, 7, 4, 49, 32),
+  Least_Ideal = c(6, 1, 0, 20, 26, 46)
+)
+
+df_long <- df |> 
+  pivot_longer(cols = -Group, names_to = "Rating", values_to = "Percentage")
+
+df_long$Group <- factor(df_long$Group, levels = rev(df$Group))  
+df_long$Rating <- factor(df_long$Rating, 
+                         levels = rev(c("Most_Ideal", "Ideal_2", "Ideal_3", 
+                                        "Ideal_4", "Ideal_5", "Least_Ideal")))
+
+ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
+  geom_bar(stat = "identity", position = "stack") +
+      geom_text(aes(label = Percentage),
+            position = position_stack(vjust = 0.5), 
+            color = "black", size = 4) + 
+  scale_fill_brewer(palette = "Blues",
+                    labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
+                     guide = guide_legend(nrow = 1, reverse=TRUE)) +  
+  labs(x = "Percentage of Respondents", y = "", fill = "") +
+  theme_classic()+
+  theme (legend.position = "none", 
+         legend.direction = "horizontal", 
+              axis.text = element_text(color = "black", size=10), 
+               legend.text = element_text(color = "black", size=10))
+
+```
+
+### How Acceptable?
+
+```{r}
+df <- data.frame(
+  Group = c("Individual", "Pair (n=2)", "Small Group (n=3-8)", 
+            "Large Group (n>8)", "With Dam", "With Nurse Cow"),
+  Strongly_Agree = c(64, 65, 51, 13, 15, 12),
+  Somewhat_Agree = c(23, 27, 33, 31, 14, 19),
+  Neutral = c(3, 4, 8, 16, 22, 19),
+  Somewhat_Disagree = c(8, 3, 6, 28, 26, 28),
+  Strongly_Disagree = c(2, 1, 2, 12, 23, 22)
+)
+
+
+df_long <- df |> 
+  pivot_longer(cols = -Group, names_to = "Rating", values_to = "Percentage")
+
+df_long$Group <- factor(df_long$Group, levels = rev(df$Group))  
+df_long$Rating <- factor(df_long$Rating, 
+                         levels = rev(c("Strongly_Agree", "Somewhat_Agree",                                  "Neutral", "Somewhat_Disagree", "Strongly_Disagree")))
+
+
+
+ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
+  geom_bar(stat = "identity", position = "stack") +
+    geom_text(aes(label = Percentage),
+            position = position_stack(vjust = 0.5), 
+            color = "black", size = 4) + 
+  scale_fill_brewer(palette = "Blues",
+                    labels = c("Strongly Disagree","", "Neutral", "","Strongly Agree"), 
+                     guide = guide_legend(nrow = 1, reverse=TRUE)) +  
+  labs(x = "Percentage of Respondents", y = "", fill = "") +
+  theme_classic()+
+  theme (legend.position = "none",
+         legend.direction = "vertical",
+              axis.text = element_text(color = "black", size=10), 
+               legend.text = element_text(color = "black", size=10))
 
 
 ```
