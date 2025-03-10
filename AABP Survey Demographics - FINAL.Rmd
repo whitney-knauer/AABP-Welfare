@@ -33,6 +33,7 @@ library(ggpubr)
 library(MASS)
 library(pscl)
 library(knitr)
+library(RColorBrewer)
 
 ```
 
@@ -667,20 +668,8 @@ legend("center", legend = c(">75%", "25 - 50%", "50 - 75%"),
 
 #INDV: Country sig, age and gender are not. 
 #people from US are at a lower odds of being in a higher category (more positive for indv housing)
-cha_mf$Country <- relevel(cha_mf$Country, ref = "US")
-
-model <- polr(Indv~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
-summary(model)
-
-ctable <- coef(summary(model))
-p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
-(ctable <- cbind(ctable, "p value" = p))
-(ci <- confint(model))
-confint.default(model)
-exp(coef(model))
-exp(cbind(OR = coef(model), ci))
-
-cha_mf$Country <- relevel(cha_mf$Country, ref = "CAN")
+cha_mf$Country <- relevel(factor(cha_mf$Country), ref = "US")
+cha_mf$Age1 <- relevel(factor(cha_mf$Age1), ref = "young")
 
 model <- polr(Indv~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
 summary(model)
@@ -1048,6 +1037,9 @@ legend("center", legend = c("CAN", "US"),
 
 #So being female is associated with being less supporting of individual housing; being from US means more supportive of individual housing. 
 
+cha_mf$Country <- relevel(factor(cha_mf$Country), ref = "US")
+cha_mf$Age1 <- relevel(factor(cha_mf$Age1), ref = "young")
+
 model <- polr(HouseIndv~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
 summary(model)
 
@@ -1216,7 +1208,11 @@ legend("center", legend = c("US", "CAN"),
        fill = c(2, 4))
 
 #Transition Feasibility: country yes, not age or gender
-#US higher odds in being in a higher category. They hate the idea. Canadaians LOEVE it. 
+#US higher odds in being in a higher category. They hate the idea. Canadaians LOEVE it.
+cha_mf$Country <- relevel(factor(cha_mf$Country), ref = "US")
+cha_mf$Age1 <- relevel(factor(cha_mf$Age1), ref = "young")
+
+
 model <- polr(FeasibleINDVtoPAIR~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
 summary(model)
 
@@ -1287,6 +1283,8 @@ print(xtabs_common)
 xtabs_common <- xtabs(~ DairyRegion + MostComm20y, cha)
 print(xtabs_common)
 
+cha_mf$Country <- relevel(factor(cha_mf$Country), ref = "US")
+cha_mf$Age1 <- relevel(factor(cha_mf$Age1), ref = "young")
 
 #Most Common in 20years: no differences, but not sure this is the right way to handle this data? 
 model <- polr(MostComm20y~ Gender1 + Age1 + Country , data = cha_mf, method="logistic", Hess=TRUE)
@@ -1330,15 +1328,16 @@ df_long$Rating <- factor(df_long$Rating,
                          levels = rev(c("Most_Ideal", "Ideal_2", "Ideal_3", 
                                         "Ideal_4", "Ideal_5", "Least_Ideal")))
 
+
 ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
-  geom_bar(stat = "identity", position = "stack") +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
       geom_text(aes(label = Percentage),
             position = position_stack(vjust = 0.5), 
-            color = "black", size = 4) + 
+            color = "black", size = 5) + 
   scale_fill_brewer(palette = "Blues",
                     labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
-  labs(x = "Percentage of Respondents", y = "", fill = "") +
+  labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
   theme_classic()+
   theme (legend.position = "none", 
          legend.direction = "horizontal", 
@@ -1371,11 +1370,11 @@ df_long$Rating <- factor(df_long$Rating,
 
 
 ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
-  geom_bar(stat = "identity", position = "stack") +
+  geom_bar(stat = "identity", position = "stack", color="black") +
     geom_text(aes(label = Percentage),
             position = position_stack(vjust = 0.5), 
-            color = "black", size = 4) + 
-  scale_fill_brewer(palette = "Blues",
+            color = "black", size = 5) + 
+  scale_fill_brewer(palette = "Blues", direction = -1, 
                     labels = c("Strongly Disagree","", "Neutral", "","Strongly Agree"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents", y = "", fill = "") +
