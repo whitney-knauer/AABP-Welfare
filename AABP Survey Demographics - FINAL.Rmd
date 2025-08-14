@@ -34,6 +34,10 @@ library(MASS)
 library(pscl)
 library(knitr)
 library(RColorBrewer)
+library(extrafont)
+
+font_import()
+loadfonts(device="win")
 
 ```
 
@@ -1331,10 +1335,12 @@ df_long$Rating <- factor(df_long$Rating,
 
 ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
   geom_bar(stat = "identity", position = "stack", color = "black") +
-      geom_text(aes(label = Percentage),
+      geom_text(
+        aes(label = ifelse(Percentage > 1, Percentage, "")),
             position = position_stack(vjust = 0.5), 
-            color = "black", size = 5) + 
-  scale_fill_brewer(palette = "Blues",
+            color = "black", size = 3.5, 
+            family = "Times New Roman") + 
+  scale_fill_brewer(palette = "Blues", direction = -1,
                     labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
@@ -1342,7 +1348,8 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
   theme (legend.position = "none", 
          legend.direction = "horizontal", 
               axis.text = element_text(color = "black", size=10), 
-               legend.text = element_text(color = "black", size=10))
+               legend.text = element_text(color = "black", size=10))+
+                theme(text=element_text(size=12, family = "Times New Roman"))
 
 ```
 
@@ -1371,18 +1378,21 @@ df_long$Rating <- factor(df_long$Rating,
 
 ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
   geom_bar(stat = "identity", position = "stack", color="black") +
-    geom_text(aes(label = Percentage),
+    geom_text(
+            aes(label = ifelse(Percentage > 1, Percentage, "")),
             position = position_stack(vjust = 0.5), 
-            color = "black", size = 5) + 
+            color = "black", size = 3.5, 
+            family = "Times New Roman")+ 
   scale_fill_brewer(palette = "Blues", direction = -1, 
                     labels = c("Strongly Disagree","", "Neutral", "","Strongly Agree"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
-  labs(x = "Percentage of Respondents", y = "", fill = "") +
+  labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
   theme_classic()+
   theme (legend.position = "none",
          legend.direction = "vertical",
               axis.text = element_text(color = "black", size=10), 
-               legend.text = element_text(color = "black", size=10))
+               legend.text = element_text(color = "black", size=10))+
+  theme(text=element_text(size=12, family = "Times New Roman"))
 
 
 ```
