@@ -1340,7 +1340,54 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
             position = position_stack(vjust = 0.5), 
             color = "black", size = 3.5, 
             family = "Times New Roman") + 
-  scale_fill_brewer(palette = "Blues", direction = -1,
+  scale_fill_brewer(palette = "YlOrRd", direction = -1,
+                    labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
+                     guide = guide_legend(nrow = 1, reverse=TRUE)) +  
+  labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
+  theme_classic()+
+  theme (legend.position = "top", 
+         legend.direction = "horizontal", 
+              axis.text = element_text(color = "black", size=10), 
+               legend.text = element_text(color = "black", size=10))+
+                theme(text=element_text(size=12, family = "Times New Roman"))
+
+```
+
+```{r}
+df <- data.frame(
+  Group = c("Individual", "Pair (n=2)", "Small Group (n=3-8)", 
+            "Large Group (n>8)", "With Dam", "With Nurse Cow"),
+  Most_Ideal = c(48, 28, 15, 1, 6, 1),
+  Ideal_2 = c(17, 52, 16, 6, 4, 5),
+  Ideal_3 = c(16, 8, 54, 10, 5, 8),
+  Ideal_4 = c(9, 6, 8, 59, 10, 8),
+  Ideal_5 = c(4, 5, 7, 4, 49, 32),
+  Least_Ideal = c(6, 1, 0, 20, 26, 46)
+)
+
+df_long <- df |> 
+  pivot_longer(cols = -Group, names_to = "Rating", values_to = "Percentage")
+
+df_long$Group <- factor(df_long$Group, levels = rev(df$Group))  
+df_long$Rating <- factor(df_long$Rating, 
+                         levels = rev(c("Most_Ideal", "Ideal_2", "Ideal_3", 
+                                        "Ideal_4", "Ideal_5", "Least_Ideal")))
+
+
+ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+      geom_text(
+        aes(label = ifelse(Percentage > 1, Percentage, "")),
+            position = position_stack(vjust = 0.5), 
+            color = "black", size = 3.5, 
+            family = "Times New Roman") + 
+  scale_fill_manual(values = c(
+              "Most_Ideal" = "grey99",
+              "Ideal_2" =  "grey89", 
+              "Ideal_3" = "grey79", 
+              "Ideal_4" = "grey69",
+              "Ideal_5" = "grey59",
+              "Least_Ideal"= "grey49"),
                     labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
@@ -1351,6 +1398,15 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
                legend.text = element_text(color = "black", size=10))+
                 theme(text=element_text(size=12, family = "Times New Roman"))
 
+
+
+scale_fill_manual(values = c(
+              "Most_Ideal" = "seashell",
+              "Ideal_2" =  "lightblue1", 
+              "Ideal_3" = "lightskyblue", 
+              "Ideal_4" = "deepskyblue2",
+              "Ideal_5" = "deepskyblue3",
+              "Least_Ideal"= "deepskyblue4"),
 ```
 
 ### How Acceptable?
