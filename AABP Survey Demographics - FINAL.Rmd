@@ -1382,12 +1382,12 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
             color = "black", size = 3.5, 
             family = "Times New Roman") + 
   scale_fill_manual(values = c(
-              "Most_Ideal" = "grey99",
-              "Ideal_2" =  "grey89", 
-              "Ideal_3" = "grey79", 
-              "Ideal_4" = "grey69",
-              "Ideal_5" = "grey59",
-              "Least_Ideal"= "grey49"),
+              "Most_Ideal" = "#55C667FF",
+              "Ideal_2" =  "#73D055FF", 
+              "Ideal_3" = "#95D840FF", 
+              "Ideal_4" = "#B8DE29FF",
+              "Ideal_5" = "#DCE319FF",
+              "Least_Ideal"= "#FDE725FF"),
                     labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
@@ -1396,7 +1396,7 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
          legend.direction = "horizontal", 
               axis.text = element_text(color = "black", size=10), 
                legend.text = element_text(color = "black", size=10))+
-                theme(text=element_text(size=12, family = "Times New Roman"))
+                theme(text=element_text(size=10, family = "Times New Roman"))
 
 
 
@@ -1407,6 +1407,22 @@ scale_fill_manual(values = c(
               "Ideal_4" = "deepskyblue2",
               "Ideal_5" = "deepskyblue3",
               "Least_Ideal"= "deepskyblue4"),
+              
+              scale_fill_manual(values = c(
+              "Most_Ideal" = "grey99",
+              "Ideal_2" =  "grey89", 
+              "Ideal_3" = "grey79", 
+              "Ideal_4" = "grey69",
+              "Ideal_5" = "grey59",
+              "Least_Ideal"= "grey49")
+              
+                scale_fill_manual(values = c(
+              "Most_Ideal" = "white",
+              "Ideal_2" =  "cadetblue1", 
+              "Ideal_3" = "cadetblue2", 
+              "Ideal_4" = "cadetblue3",
+              "Ideal_5" = "cadetblue",
+              "Least_Ideal"= "cadetblue4")
 ```
 
 ### How Acceptable?
