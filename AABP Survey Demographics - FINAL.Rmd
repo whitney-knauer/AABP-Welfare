@@ -1340,16 +1340,22 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
             position = position_stack(vjust = 0.5), 
             color = "black", size = 3.5, 
             family = "Times New Roman") + 
-  scale_fill_brewer(palette = "YlOrRd", direction = -1,
+    scale_fill_manual(values = c(
+              "Most_Ideal" = "grey99",
+              "Ideal_2" =  "grey91", 
+              "Ideal_3" = "grey83", 
+              "Ideal_4" = "grey75",
+              "Ideal_5" = "grey67",
+              "Least_Ideal"= "grey59"),
                     labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
   theme_classic()+
-  theme (legend.position = "top", 
+  theme (legend.position = "none", 
          legend.direction = "horizontal", 
               axis.text = element_text(color = "black", size=10), 
                legend.text = element_text(color = "black", size=10))+
-                theme(text=element_text(size=12, family = "Times New Roman"))
+                theme(text=element_text(size=10, family = "Times New Roman"))
 
 ```
 
@@ -1381,13 +1387,13 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
             position = position_stack(vjust = 0.5), 
             color = "black", size = 3.5, 
             family = "Times New Roman") + 
-  scale_fill_manual(values = c(
-              "Most_Ideal" = "#55C667FF",
-              "Ideal_2" =  "#73D055FF", 
-              "Ideal_3" = "#95D840FF", 
-              "Ideal_4" = "#B8DE29FF",
-              "Ideal_5" = "#DCE319FF",
-              "Least_Ideal"= "#FDE725FF"),
+    scale_fill_manual(values = c(
+              "Most_Ideal" = "grey99",
+              "Ideal_2" =  "grey91", 
+              "Ideal_3" = "grey83", 
+              "Ideal_4" = "grey75",
+              "Ideal_5" = "grey67",
+              "Least_Ideal"= "grey59"),
                     labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
@@ -1414,7 +1420,7 @@ scale_fill_manual(values = c(
               "Ideal_3" = "grey79", 
               "Ideal_4" = "grey69",
               "Ideal_5" = "grey59",
-              "Least_Ideal"= "grey49")
+              "Least_Ideal"= "grey52")
               
                 scale_fill_manual(values = c(
               "Most_Ideal" = "white",
@@ -1423,6 +1429,14 @@ scale_fill_manual(values = c(
               "Ideal_4" = "cadetblue3",
               "Ideal_5" = "cadetblue",
               "Least_Ideal"= "cadetblue4")
+              
+               scale_fill_manual(values = c(
+              "Most_Ideal" = "#55C667FF",
+              "Ideal_2" =  "#73D055FF", 
+              "Ideal_3" = "#95D840FF", 
+              "Ideal_4" = "#B8DE29FF",
+              "Ideal_5" = "#DCE319FF",
+              "Least_Ideal"= "#FDE725FF")
 ```
 
 ### How Acceptable?
@@ -1435,8 +1449,7 @@ df <- data.frame(
   Somewhat_Agree = c(23, 27, 33, 31, 14, 19),
   Neutral = c(3, 4, 8, 16, 22, 19),
   Somewhat_Disagree = c(8, 3, 6, 28, 26, 28),
-  Strongly_Disagree = c(2, 1, 2, 12, 23, 22)
-)
+  Strongly_Disagree = c(2, 1, 2, 12, 23, 22))
 
 
 df_long <- df |> 
@@ -1446,25 +1459,29 @@ df_long$Group <- factor(df_long$Group, levels = rev(df$Group))
 df_long$Rating <- factor(df_long$Rating, 
                          levels = rev(c("Strongly_Agree", "Somewhat_Agree",                                  "Neutral", "Somewhat_Disagree", "Strongly_Disagree")))
 
-
-
 ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
-  geom_bar(stat = "identity", position = "stack", color="black") +
-    geom_text(
-            aes(label = ifelse(Percentage > 1, Percentage, "")),
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+      geom_text(
+        aes(label = ifelse(Percentage > 1, Percentage, "")),
             position = position_stack(vjust = 0.5), 
             color = "black", size = 3.5, 
-            family = "Times New Roman")+ 
-  scale_fill_brewer(palette = "Blues", direction = -1, 
-                    labels = c("Strongly Disagree","", "Neutral", "","Strongly Agree"), 
+            family = "Times New Roman") + 
+    scale_fill_manual(values = c(
+              "Strongly_Agree" = "grey99",
+              "Somewhat_Agree" =  "grey89", 
+              "Neutral" = "grey79", 
+              "Somewhat_Disagree" = "grey69",
+              "Strongly_Disagree" = "grey59"),
+                    labels = c("Strongly Disagree", "", "", "", "", "Strongly Agree"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
   theme_classic()+
-  theme (legend.position = "none",
-         legend.direction = "vertical",
+  theme (legend.position = "none", 
+         legend.direction = "horizontal", 
               axis.text = element_text(color = "black", size=10), 
                legend.text = element_text(color = "black", size=10))+
-  theme(text=element_text(size=12, family = "Times New Roman"))
+                theme(text=element_text(size=10, family = "Times New Roman"))
+
 
 
 ```
