@@ -35,6 +35,7 @@ library(pscl)
 library(knitr)
 library(RColorBrewer)
 library(extrafont)
+library(rcartocolor)
 
 #font_import()
 #loadfonts(device="win")
@@ -1343,20 +1344,20 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
             color = "black", size = 3.5, 
             family = "Times New Roman") + 
     scale_fill_manual(values = c(
-              "Most_Ideal" = "grey99",
-              "Ideal_2" =  "grey91", 
-              "Ideal_3" = "grey83", 
-              "Ideal_4" = "grey75",
-              "Ideal_5" = "grey67",
-              "Least_Ideal"= "grey59"),
+              "Most_Ideal" = "#2066a8",
+              "Ideal_2" =  "#8ec1da", 
+              "Ideal_3" = "#cde1ec", 
+              "Ideal_4" = "#f6d6c2",
+              "Ideal_5" = "#d47264",
+              "Least_Ideal"= "#ae282c"),
                     labels = c("Least Ideal", "", "", "", "", "Most Ideal"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
   theme_classic()+
-  theme (legend.position = "none", 
+  theme (legend.position = "top", 
          legend.direction = "horizontal", 
               axis.text = element_text(color = "black", size=10), 
-               legend.text = element_text(color = "black", size=10))+
+               legend.text = element_text(color = "black", size=9))+
                 theme(text=element_text(size=10, family = "Times New Roman"))
 
 ```
@@ -1444,6 +1445,7 @@ scale_fill_manual(values = c(
 ### How Acceptable?
 
 ```{r}
+
 df <- data.frame(
   Group = c("Individual", "Pair (n=2)", "Small Group (n=3-8)", 
             "Large Group (n>8)", "With Dam", "With Nurse Cow"),
@@ -1469,19 +1471,19 @@ ggplot(df_long, aes(x = Percentage, y = Group, fill = Rating)) +
             color = "black", size = 3.5, 
             family = "Times New Roman") + 
     scale_fill_manual(values = c(
-              "Strongly_Agree" = "grey99",
-              "Somewhat_Agree" =  "grey89", 
-              "Neutral" = "grey79", 
-              "Somewhat_Disagree" = "grey69",
-              "Strongly_Disagree" = "grey59"),
-                    labels = c("Strongly Disagree", "", "", "", "", "Strongly Agree"), 
+              "Strongly_Agree" = "#8ec1da",
+              "Somewhat_Agree" =  "#cde1ec", 
+              "Neutral" = "#ededed", 
+              "Somewhat_Disagree" = "#f6d6c2",
+              "Strongly_Disagree" = "#d47264"),
+                    labels = c("Strongly Disagree", "Somewhat Disagree", "Neutral", "Somewhat Agree", "Strongly Agree"), 
                      guide = guide_legend(nrow = 1, reverse=TRUE)) +  
   labs(x = "Percentage of Respondents (%)", y = "", fill = "") +
   theme_classic()+
-  theme (legend.position = "none", 
+  theme (legend.position = "top", 
          legend.direction = "horizontal", 
               axis.text = element_text(color = "black", size=10), 
-               legend.text = element_text(color = "black", size=10))+
+               legend.text = element_text(color = "black", size=8))+
                 theme(text=element_text(size=10, family = "Times New Roman"))
 
 
