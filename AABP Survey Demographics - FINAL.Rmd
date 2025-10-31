@@ -36,8 +36,8 @@ library(knitr)
 library(RColorBrewer)
 library(extrafont)
 
-font_import()
-loadfonts(device="win")
+#font_import()
+#loadfonts(device="win")
 
 ```
 
@@ -672,6 +672,8 @@ legend("center", legend = c(">75%", "25 - 50%", "50 - 75%"),
 
 #INDV: Country sig, age and gender are not. 
 #people from US are at a lower odds of being in a higher category (more positive for indv housing)
+levels(cha_mf$Indv)
+
 cha_mf$Country <- relevel(factor(cha_mf$Country), ref = "US")
 cha_mf$Age1 <- relevel(factor(cha_mf$Age1), ref = "young")
 
