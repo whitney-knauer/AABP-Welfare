@@ -670,6 +670,9 @@ legend("center", legend = c(">75%", "25 - 50%", "50 - 75%"),
 #### Age Dichotomous
 
 ```{r}
+
+#NEED TO DO LIKELIHOOD RATIO TEST? COMPARE FULL MODEL TO REDUCED MODEL (ANOVA(REDUCED, FULL))
+
 #can we put all these in the same model? 
 
 #INDV: Country sig, age and gender are not. 
