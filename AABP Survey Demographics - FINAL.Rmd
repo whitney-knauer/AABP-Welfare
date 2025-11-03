@@ -671,7 +671,6 @@ legend("center", legend = c(">75%", "25 - 50%", "50 - 75%"),
 
 ```{r}
 
-#NEED TO DO LIKELIHOOD RATIO TEST? COMPARE FULL MODEL TO REDUCED MODEL (ANOVA(REDUCED, FULL))
 
 #can we put all these in the same model? 
 
@@ -685,6 +684,7 @@ cha_mf$Age1 <- relevel(factor(cha_mf$Age1), ref = "young")
 model <- polr(Indv~ Gender1 + Age1 + Country, data = cha_mf, Hess=TRUE)
 summary(model)
 brant::brant(model)
+
 
 ctable <- coef(summary(model))
 p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
