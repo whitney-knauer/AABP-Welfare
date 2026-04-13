@@ -1,0 +1,64 @@
+---
+title: "AABP Focus Group Demo"
+author: "WAK"
+format: html
+editor: visual
+---
+
+```{r}
+#| include: false
+#| echo: false
+
+library(tidyverse)
+library(skimr)
+library(dplyr)
+library(ggplot2)
+library(ggbeeswarm)
+library(lme4)
+library(car)
+library(emmeans)
+library(gmodels)
+library(epiDisplay)
+library(psych)
+library(doBy)
+library(ggpubr)
+library(MASS)
+library(pscl)
+library(knitr)
+library(RColorBrewer)
+library(extrafont)
+library(rcartocolor)
+library(brant)
+```
+
+### Data Steps
+
+```{r}
+#| include: false
+#| echo: false
+
+fg <- read_csv("data/fg demographics.csv") 
+```
+
+### Summary
+
+```{r}
+#| include: false
+#| echo: false
+
+fg %>% 
+  group_by(Gender) %>% 
+  count()
+
+fg %>% 
+  group_by(Age) %>% 
+  count()
+
+fg %>% 
+  group_by(State) %>% 
+  count()
+
+tab1(fg$Age, cum.percent = TRUE)
+
+
+```
