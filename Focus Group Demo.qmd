@@ -13,6 +13,7 @@ library(tidyverse)
 library(skimr)
 library(dplyr)
 library(ggplot2)
+library(usmap)
 library(ggbeeswarm)
 library(lme4)
 library(car)
@@ -43,8 +44,6 @@ fg <- read_csv("data/fg demographics.csv")
 ### Summary
 
 ```{r}
-#| include: false
-#| echo: false
 
 fg %>% 
   group_by(Gender) %>% 
@@ -58,7 +57,137 @@ fg %>%
   group_by(State) %>% 
   count()
 
-tab1(fg$Age, cum.percent = TRUE)
 
 
+```
+
+### US Map Heat Map
+
+```{r}
+
+# 1. Input your data
+df <- data.frame(
+  state = c("Iowa", "Michigan", "Minnesota", "New York", "Ohio", "Pennsylvania", "Wisconsin"),
+  n = c(1, 1, 16, 2, 1, 1, 9))
+
+# 2. Plot the heat map
+plot_usmap(
+  data = df, 
+  values = "n", 
+  exclude = c("AK", "HI"), # Excludes non-Lower 48 states
+  color = "white",         # State border color
+  size = 0.3
+) +
+  scale_fill_continuous(
+    low = "#fee0d2", 
+    high = "#de2d26", 
+    name = "Count (n)",
+    na.value = "#f0f0f0") +
+  labs(
+    title = "Lower 48 State Map",
+    subtitle = "Concentration of counts by state") +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5))
+```
+
+### Producer Experience Graphs
+
+```{r}
+
+# 1. Create the dataset
+df <- data.frame(
+  category = c("Individual housing only", "Social housing"),
+  count = c(19, 12)
+) %>%
+  mutate(
+    percentage = round(count / sum(count) * 100, 1),
+    # Combine label, count, and percentage for the chart key/labels
+    label = paste0(count, " (", percentage, "%)")
+  )
+
+# Donut chart variant
+ggplot(df, aes(x = 2, y = count, fill = category)) +
+  geom_bar(stat = "identity", color = "white", size = 1.2) +
+  coord_polar(theta = "y") +
+  xlim(0.5, 2.5) + # Controls the inner hole size
+  # Centered total label inside the hole
+  annotate("text", x = 0.5, y = 0, label = paste0("Total\n", sum(df$count)), 
+           size = 6, fontface = "bold", color = "#333333") +
+  # Slice labels
+  geom_text(
+    aes(label = label),
+    position = position_stack(vjust = 0.5),
+    color = "black",
+    fontface = "bold",
+    size = 4.5
+  ) +
+  scale_fill_manual(values = c("Individual housing only" = "#a52a2a", 
+                               "Social housing" = "#cd5c5c")) +
+  labs(
+    title = "Housing Breakdown",
+    fill = NULL
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    legend.position = "bottom"
+  )
+
+```
+
+```{r}
+
+
+# 1. Create the dataset
+df <- data.frame(
+  category = c(
+    "No transition experienced",
+    "Reverted from social to individual housing",
+    "Switched from individual housing to social"
+  ),
+  count = c(23, 5, 3)
+) %>%
+  mutate(
+    percentage = round(count / sum(count) * 100, 1),
+    # Combine count and percentage on one single line
+    label = paste0(count, " (", percentage, "%)")
+  )
+
+# Preserve order
+df$category <- factor(df$category, levels = df$category)
+
+# 2. Define custom yellow palette
+yellow_palette <- c(
+  "No transition experienced" = "#d4a373",                    # Warm Honey / Amber
+  "Reverted from social to individual housing" = "#ffb703",   # Bright Yellow
+  "Switched from individual housing to social" = "#ffe6a7"    # Soft Light Yellow
+)
+
+# 3. Plot the Donut Chart
+ggplot(df, aes(x = 2, y = count, fill = category)) +
+  geom_bar(stat = "identity", color = "white", size = 1.2) +
+  coord_polar(theta = "y") +
+  xlim(0.5, 2.5) +
+  # Slice labels in one line
+  geom_text(
+    aes(label = label),
+    position = position_stack(vjust = 0.5),
+    color = "#2b2b2b",
+    fontface = "bold",
+    size = 3.8
+  ) +
+  scale_fill_manual(values = yellow_palette) +
+  labs(
+    title = "Housing Transitions Breakdown",
+    fill = NULL
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5, margin = margin(b = 15)),
+    legend.position = "bottom",
+    legend.text = element_text(size = 10)
+  ) +
+  guides(fill = guide_legend(ncol = 1))
 ```
